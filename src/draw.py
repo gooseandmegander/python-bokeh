@@ -9,6 +9,7 @@ from graph import *
 
 graph_data = Graph()
 graph_data.debug_create_test_data()
+graph_data.bfs(graph_data.vertexes[0])
 
 N = len(graph_data.vertexes)
 node_indices = list(range(N))
@@ -18,7 +19,7 @@ color_list = []
 for vertex in graph_data.vertexes:
     color_list.append(vertex.color)
 
-plot = figure(title='Python-Bokeh Demonstration', x_range=(0, 750), y_range=(600, 0),
+plot = figure(title='Python-Bokeh Demonstration', plot_width=750, plot_height=600, x_range=(0, 750), y_range=(600, 0),
               tools='', toolbar_location=None)
 
 # graph variable pointing to GraphRenderer class instance
@@ -28,16 +29,24 @@ graph = GraphRenderer()
 ## TODO: Give glyphs labels
 # Label
 
-source = ColumnDataSource(data=dict(y_axis=[40, 140, 300, 500, 58, 62],
-                                    x_axis=[40, 140, 500, 300, 260, 174],
-                                    labels=['1', '2', '3', '4',
-                                           '5', '6']))
+label_x_values = []
+label_y_values = []
+label_vertex_indices = []
+
+for i, vertex in enumerate(graph_data.vertexes):
+    label_x_values.append(vertex.pos['x'])
+    label_y_values.append(vertex.pos['y'])
+    label_vertex_indices.append(i)
+
+source = ColumnDataSource(data=dict(y_axis=label_x_values,
+                                    x_axis=label_y_values,
+                                    labels=label_vertex_indices))
 
 plot.scatter(x='x_axis', y='y_axis', size=8, source=source)
 plot.xaxis[0].axis_label = 'X-Axis'
 plot.yaxis[0].axis_label = 'Y-Axis'
 
-labels = LabelSet(x='x_axis', y='y_axis', text='labels', level='glyph',
+labels = LabelSet(x='x_axis', y='y_axis', text='labels', level='overlay',
               x_offset=-4, y_offset=-9, source=source, render_mode='canvas')
 
 
