@@ -2,7 +2,7 @@ import math
 
 from bokeh.io import show, output_file
 from bokeh.plotting import figure
-from bokeh.models import GraphRenderer, StaticLayoutProvider, Oval
+from bokeh.models import GraphRenderer, StaticLayoutProvider, Oval, ColumnDataSource, Range1d, Label, LabelSet
 from bokeh.palettes import Spectral8
 
 from graph import *
@@ -10,11 +10,14 @@ from graph import *
 graph_data = Graph()
 graph_data.debug_create_test_data()
 
-# N sets number of vertices and node_indices creates list with N capacity
-N = 8
+N = len(graph_data.vertexes)
 node_indices = list(range(N))
 
-# Creating the graph plot's title, x-axis range, y-axis range, and tool features (none)
+
+color_list = []
+for vertex in graph_data.vertexes:
+    color_list.append(vertex.color)
+
 plot = figure(title='Python-Bokeh Demonstration', x_range=(0, 750), y_range=(600, 0),
               tools='', toolbar_location=None)
 
@@ -23,25 +26,44 @@ plot = figure(title='Python-Bokeh Demonstration', x_range=(0, 750), y_range=(600
 graph = GraphRenderer()
 
 ## TODO: Give glyphs labels
+# Label
+
+source = ColumnDataSource(data=dict(y_axis=[40, 140, 300, 500, 58, 62],
+                                    x_axis=[40, 140, 500, 300, 260, 174],
+                                    labels=['1', '2', '3', '4',
+                                           '5', '6']))
+
+plot.scatter(x='x_axis', y='y_axis', size=8, source=source)
+plot.xaxis[0].axis_label = 'X-Axis'
+plot.yaxis[0].axis_label = 'Y-Axis'
+
+labels = LabelSet(x='x_axis', y='y_axis', text='labels', level='glyph',
+              x_offset=-4, y_offset=-9, source=source, render_mode='canvas')
+
+
 
 # looks like this is adding the list of vertices to a key 'index'
 graph.node_renderer.data_source.add(node_indices, 'index')
 # looks like this is adding a color palette to node_renderer to use below
-graph.node_renderer.data_source.add(Spectral8, 'color')
-# oval also takes x, y as arguments before height...
-graph.node_renderer.glyph = Oval(height=10, width=10, fill_color='color')
+graph.node_renderer.data_source.add(color_list, 'color')
+graph.node_renderer.glyph = Oval(height=30, width=30, fill_color='color')
 
-# looks like this is adding a dict object holding start and end values of the edges
-# here all 7 vertices connect to 1 central vertex (start)
+start_indices = []
+end_indices = []
+
+for start_index, vertex in enumerate(graph_data.vertexes):
+    for edge in vertex.edges:
+        start_indices.append(start_index)
+        end_indices.append(graph_data.vertexes.index(edge.destination))
+
 graph.edge_renderer.data_source.data = dict(
-    start=[0]*N,
-    end=node_indices)
+    start= start_indices,
+    end= end_indices)
 
 ### start of layout code
-# creating a circle, x-coordinate, and y-coordinate for each vertex
-circ = [i*2*math.pi/N for i in node_indices]
-x = [math.cos(i) for i in circ]
-y = [math.sin(i) for i in circ]
+# creating x-coordinate, and y-coordinate for each vertex
+x = [v.pos['x'] for v in graph_data.vertexes]
+y = [v.pos['y'] for v in graph_data.vertexes]
 
 # creating dict object holding tuples of node and coordinate pairs
 # serving it to the graph class' layout
@@ -50,6 +72,7 @@ graph.layout_provider = StaticLayoutProvider(graph_layout=graph_layout)
 
 # adds graph instance of GraphRenderer to graph plot
 plot.renderers.append(graph)
+plot.add_layout(labels)
 
 output_file('graph.html')
 show(plot)
