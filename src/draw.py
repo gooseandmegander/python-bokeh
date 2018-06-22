@@ -9,7 +9,7 @@ from graph import *
 
 graph_data = Graph()
 # graph_data.debug_create_test_data()
-graph_data.randomize(4, 5, 150)
+graph_data.randomize(4, 5, 0.5)
 graph_data.bfs(graph_data.vertexes[0])
 
 N = len(graph_data.vertexes)
@@ -35,9 +35,8 @@ label_y_values = []
 label_vertex_indices = []
 
 for i, vertex in enumerate(graph_data.vertexes):
-    print(vertex.pos[0])
-    label_x_values.append(vertex.pos[0])
-    label_y_values.append(vertex.pos[0])
+    label_x_values.append(vertex.pos['y'])
+    label_y_values.append(vertex.pos['x'])
     label_vertex_indices.append(i)
 
 source = ColumnDataSource(data=dict(y_axis=label_x_values,
@@ -49,7 +48,7 @@ plot.xaxis[0].axis_label = 'X-Axis'
 plot.yaxis[0].axis_label = 'Y-Axis'
 
 labels = LabelSet(x='x_axis', y='y_axis', text='labels', level='overlay',
-              x_offset=-4, y_offset=-9, source=source, render_mode='canvas')
+              x_offset=0, y_offset=0, source=source, render_mode='canvas')
 
 
 
@@ -72,9 +71,9 @@ graph.edge_renderer.data_source.data = dict(
     end= end_indices)
 
 ### start of layout code
-# creating x-coordinate, and y-coordinate for each vertex
-x = [v.pos[0] for v in graph_data.vertexes]
-y = [v.pos[0] for v in graph_data.vertexes]
+# Makes a list of x-coordinate values and list of y-coordinate values
+x = [v.pos['x'] for v in graph_data.vertexes]
+y = [v.pos['y'] for v in graph_data.vertexes]
 
 # creating dict object holding tuples of node and coordinate pairs
 # serving it to the graph class' layout

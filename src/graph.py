@@ -67,15 +67,15 @@ class Graph:
             v0.edges.append(Edge(v1))
             v1.edges.append(Edge(v0))
         
-        count = 0
 
         # Build grid of vertices
-        grid = []
+        grid = [] # a list of 4 lists of 5 vertices
+        count = 0
         for y in range(height):
             row = []
             for x in range(width):
-                value = 'v'
-                v = Vertex(value)
+                v = Vertex(count)
+                count += 1
                 row.append(v)
             grid.append(row)
         
@@ -83,26 +83,26 @@ class Graph:
         for y in range(height):
             for x in range(width):
 
-                # Connect down
+                # Connect North/South
                 if y < height - 1:
                     if random.uniform(0, 1) < self.probability:
                         connectVerts(grid[y][x], grid[y + 1][x])
                 
-                # Connect right
+                # Connect East/West
                 if x < width -1:
                     if random.uniform(0, 1) < self.probability:
                         connectVerts(grid[y][x], grid[y][x + 1])
         
         boxBuffer = 0.8
-        boxInner = pxBox * boxBuffer
-        boxInnerOffset = (pxBox - boxInner) / 2
+        boxInner = pxBox * boxBuffer # 12
+        boxInnerOffset = (pxBox - boxInner) / 2 # 1.5
 
         for y in range(height):
             for x in range(width):
-                grid[y][x].pos = dict(x= (x * pxBox + boxInnerOffset + random.uniform(0, 1)) * boxInner),
-                grid[y][x].pos = dict(y= (y * pxBox + boxInnerOffset + random.uniform(0, 1)) * boxInner),
+                grid[y][x].pos = dict(x= random.randint(0,750),
+                                    y= random.randint(0, 600))
 
-        # Add grid to the vertices
         for y in range(height):
             for x in range(width):
                 self.vertexes.append(grid[y][x])
+
