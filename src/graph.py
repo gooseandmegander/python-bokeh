@@ -19,17 +19,17 @@ class Graph:
         debug_vertex_1 = Vertex('t1', x=40, y=40)
         debug_vertex_2 = Vertex('t2', x=140, y=140)
         debug_vertex_3 = Vertex('t3', x=300, y=500)
-        debug_vertex_4 = Vertex('t4', x=500, y=300) # will remain unconnected
+        debug_vertex_4 = Vertex('t4', x=500, y=300)
 
         debug_edge_start_a = Edge(debug_vertex_1)
         debug_edge_start_b = Edge(debug_vertex_2)
         debug_vertex_1.edges.append(debug_edge_start_b)
         debug_vertex_2.edges.append(debug_edge_start_a)
 
-        debug_edge_start_c = Edge(debug_vertex_3)
-        debug_edge_start_d = Edge(debug_vertex_2)
-        debug_vertex_2.edges.append(debug_edge_start_c)
-        debug_vertex_3.edges.append(debug_edge_start_d)
+        # debug_edge_start_c = Edge(debug_vertex_3)
+        # debug_edge_start_d = Edge(debug_vertex_2)
+        # debug_vertex_2.edges.append(debug_edge_start_c)
+        # debug_vertex_3.edges.append(debug_edge_start_d)
 
         debug_edge_start_e = Edge(debug_vertex_1)
         debug_edge_start_f = Edge(debug_vertex_4)
@@ -59,3 +59,50 @@ class Graph:
             queue.pop(0) # TODO: Look into collections.dequeue
         return found 
 
+    def randomize(self, width, height, pxBox):
+        self.probability = 0.6
+
+        # Helper function to set up two-way edges
+        def connectVerts(v0, v1):
+            v0.edges.append(Edge(v1))
+            v1.edges.append(Edge(v0))
+        
+        count = 0
+
+        # Build grid of vertices
+        grid = []
+        for y in range(height):
+            row = []
+            for x in range(width):
+                value = 'v'
+                v = Vertex(value)
+                row.append(v)
+            grid.append(row)
+        
+        # Go through grid randomly hooking up edges
+        for y in range(height):
+            for x in range(width):
+
+                # Connect down
+                if y < height - 1:
+                    if random.uniform(0, 1) < self.probability:
+                        connectVerts(grid[y][x], grid[y + 1][x])
+                
+                # Connect right
+                if x < width -1:
+                    if random.uniform(0, 1) < self.probability:
+                        connectVerts(grid[y][x], grid[y][x + 1])
+        
+        boxBuffer = 0.8
+        boxInner = pxBox * boxBuffer
+        boxInnerOffset = (pxBox - boxInner) / 2
+
+        for y in range(height):
+            for x in range(width):
+                grid[y][x].pos = dict(x= (x * pxBox + boxInnerOffset + random.uniform(0, 1)) * boxInner),
+                grid[y][x].pos = dict(y= (y * pxBox + boxInnerOffset + random.uniform(0, 1)) * boxInner),
+
+        # Add grid to the vertices
+        for y in range(height):
+            for x in range(width):
+                self.vertexes.append(grid[y][x])

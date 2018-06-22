@@ -8,7 +8,8 @@ from bokeh.palettes import Spectral8
 from graph import *
 
 graph_data = Graph()
-graph_data.debug_create_test_data()
+# graph_data.debug_create_test_data()
+graph_data.randomize(4, 5, 150)
 graph_data.bfs(graph_data.vertexes[0])
 
 N = len(graph_data.vertexes)
@@ -34,8 +35,9 @@ label_y_values = []
 label_vertex_indices = []
 
 for i, vertex in enumerate(graph_data.vertexes):
-    label_x_values.append(vertex.pos['x'])
-    label_y_values.append(vertex.pos['y'])
+    print(vertex.pos[0])
+    label_x_values.append(vertex.pos[0])
+    label_y_values.append(vertex.pos[0])
     label_vertex_indices.append(i)
 
 source = ColumnDataSource(data=dict(y_axis=label_x_values,
@@ -71,8 +73,8 @@ graph.edge_renderer.data_source.data = dict(
 
 ### start of layout code
 # creating x-coordinate, and y-coordinate for each vertex
-x = [v.pos['x'] for v in graph_data.vertexes]
-y = [v.pos['y'] for v in graph_data.vertexes]
+x = [v.pos[0] for v in graph_data.vertexes]
+y = [v.pos[0] for v in graph_data.vertexes]
 
 # creating dict object holding tuples of node and coordinate pairs
 # serving it to the graph class' layout
